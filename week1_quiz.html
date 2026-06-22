@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thread SDE Onboarding – Week 1 Quiz</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0f14;
+    --surface: #161a23;
+    --surface2: #1e2330;
+    --border: #2a3040;
+    --accent: #5b7cf6;
+    --accent-glow: rgba(91,124,246,0.18);
+    --green: #34d399;
+    --red: #f87171;
+    --yellow: #fbbf24;
+    --text: #e8ecf5;
+    --muted: #7a85a0;
+    --radius: 12px;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 16px 64px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 40px;
+    max-width: 560px;
+  }
+
+  .badge {
+    display: inline-block;
+    background: var(--accent-glow);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 100px;
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  header p {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 620px;
+  }
+
+  /* Progress */
+  .progress-bar {
+    background: var(--surface2);
+    border-radius: 100px;
+    height: 4px;
+    margin-bottom: 28px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 100px;
+    transition: width 0.4s ease;
+  }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  /* Card */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    margin-bottom: 16px;
+    transition: border-color 0.2s;
+  }
+  .card.active { border-color: var(--accent); }
+
+  .question-num {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  .question-text {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    color: var(--text);
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 14px;
+    line-height: 1.4;
+    text-align: left;
+  }
+  .option:hover:not(.disabled) {
+    border-color: var(--accent);
+    background: var(--accent-glow);
+  }
+  .option.selected { border-color: var(--accent); background: var(--accent-glow); }
+  .option.correct { border-color: var(--green); background: rgba(52,211,153,0.1); color: var(--green); }
+  .option.wrong { border-color: var(--red); background: rgba(248,113,113,0.1); color: var(--red); }
+  .option.disabled { cursor: default; }
+
+  .option-letter {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    transition: all 0.15s;
+  }
+  .option.selected .option-letter { border-color: var(--accent); color: var(--accent); }
+  .option.correct .option-letter { border-color: var(--green); color: var(--green); }
+  .option.wrong .option-letter { border-color: var(--red); color: var(--red); }
+
+  /* Feedback */
+  .feedback {
+    margin-top: 16px;
+    padding: 14px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.5;
+    display: none;
+  }
+  .feedback.correct-fb { background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.3); color: var(--green); }
+  .feedback.wrong-fb { background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.3); color: #fca5a5; }
+  .feedback.visible { display: block; }
+  .feedback strong { display: block; margin-bottom: 4px; }
+
+  /* AI Explanation */
+  .ai-explain {
+    margin-top: 10px;
+    padding: 12px 14px;
+    background: var(--surface2);
+    border-radius: 8px;
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.6;
+    display: none;
+  }
+  .ai-explain.visible { display: block; }
+  .ai-explain .ai-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .ai-label::before { content: '✦'; }
+
+  /* Submit */
+  .btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+    font-family: 'Inter', sans-serif;
+  }
+  .btn:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .btn.secondary {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    margin-top: 8px;
+  }
+  .btn.secondary:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+
+  /* Results */
+  #results {
+    display: none;
+    text-align: center;
+  }
+  .score-ring {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    margin: 0 auto 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    border: 3px solid var(--accent);
+    box-shadow: 0 0 32px var(--accent-glow);
+  }
+  .score-ring .score-num {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .score-ring .score-denom {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  #results h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px;
+    margin-bottom: 8px;
+  }
+  #results p {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .thinking {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--muted);
+    font-style: italic;
+  }
+  .dot { animation: blink 1.2s infinite; }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes blink { 0%,80%,100%{opacity:0.3} 40%{opacity:1} }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 24px 0;
+  }
+
+  #loading-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 60px 20px;
+    text-align: center;
+  }
+  #loading-screen p { color: var(--muted); font-size: 14px; }
+  .spinner {
+    width: 32px; height: 32px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="badge">SDE Onboarding</div>
+  <h1>Week 1 Knowledge Check</h1>
+  <p>Test your understanding of Thread fundamentals, MSPs, Inbox, and your role as a Service Desk Engineer.</p>
+</header>
+
+<div class="container">
+  <div id="loading-screen">
+    <div class="spinner"></div>
+    <p>Loading your quiz…</p>
+  </div>
+
+  <div id="quiz-body" style="display:none"></div>
+  <div id="results"></div>
+</div>
+
+<script>
+const FIXED_QUESTIONS = [
+  {
+    question: "What is an MSP?",
+    options: [
+      "A) A software tool MSPs use to manage IT tickets",
+      "B) A company that remotely manages a customer's IT infrastructure on a proactive basis",
+      "C) A subscription plan for cloud storage services",
+      "D) An internal IT department within a large enterprise"
+    ],
+    correct: 1,
+    explanation: "An MSP (Managed Service Provider) acts as an outsourced IT department, proactively managing a client's IT infrastructure and end-user systems. This differs from the old break-fix model — MSPs monitor and maintain systems continuously rather than only responding when something goes wrong."
+  },
+  {
+    question: "What type of cases do SDEs primarily handle at Thread?",
+    options: [
+      "A) Sales inquiries from prospective MSP partners",
+      "B) Routine tickets that the AI handles daily",
+      "C) Edge cases that require human judgment",
+      "D) Network monitoring and cybersecurity incidents"
+    ],
+    correct: 2,
+    explanation: "SDEs (Service Desk Engineers) manage AI agents and step in specifically when human judgment is needed. The AI handles routine work, so SDEs focus on the edge cases that require experience, context, and critical thinking."
+  },
+  {
+    question: "What are Thread's three core values?",
+    options: [
+      "A) Innovative, Reliable, Transparent",
+      "B) Fast, Focused, Friendly",
+      "C) Radical, Intentional, Customer-Obsessed",
+      "D) Agile, Scalable, Secure"
+    ],
+    correct: 2,
+    explanation: "Thread's core values are Radical (challenge the status quo), Intentional (every move is driven by purpose), and Customer-Obsessed (MSPs are our heroes). These values shape how Threadies approach their work every day."
+  },
+  {
+    question: "Which PSA platforms does Thread integrate with?",
+    options: [
+      "A) ServiceNow, Zendesk, and Freshdesk",
+      "B) ConnectWise, Autotask, and HaloPSA",
+      "C) Jira, Monday, and Asana",
+      "D) ConnectWise, Zendesk, and HaloPSA"
+    ],
+    correct: 1,
+    explanation: "Thread bi-directionally syncs with ConnectWise, Autotask, and HaloPSA. This integration keeps tickets, contacts, and statuses in sync between Thread Inbox and the partner's PSA without disrupting existing workflows."
+  },
+  {
+    question: "How do you access the Admin Panel in Inbox?",
+    options: [
+      "A) Click the gear icon in the top right corner",
+      "B) Select your profile in the bottom left → Admin Panel",
+      "C) Go to Settings in the left panel",
+      "D) Open the hamburger menu at the top left"
+    ],
+    correct: 1,
+    explanation: "To access the Admin Panel, select your profile in the bottom left of Inbox and choose Admin Panel. This is where you can configure Triage Agent settings, Flows, Clients, Status Mapping, and more."
+  },
+  {
+    question: "Where do you go to configure status automations in Thread?",
+    options: [
+      "A) Inbox → Settings → Status Mapping",
+      "B) Retool → Partner Workspace → Status Mapping",
+      "C) Admin Panel → Status Mapping",
+      "D) Admin Panel → Flows → Status Mapping"
+    ],
+    correct: 2,
+    explanation: "Status automations are configured under Admin Panel → Status Mapping. Status automations will automatically map the ticket status based on pre-determined workflows."
+  },
+  {
+    question: "What tool do we use to access partner workspace information and individual ticket content?",
+    options: [
+      "A) Linear",
+      "B) Thread Admin Panel",
+      "C) Retool",
+      "D) Inbox"
+    ],
+    correct: 2,
+    explanation: "Retool is where SDEs research partner information — including Magic Agent settings, ticket notes, interactions, flow logs, and intent process logs. The Partner Workspace app in Retool is the go-to for digging into partner-specific data."
+  },
+  {
+    question: "Where do we open requests for our engineering team?",
+    options: [
+      "A) Slack",
+      "B) Retool",
+      "C) Linear",
+      "D) Jira"
+    ],
+    correct: 2,
+    explanation: "Engineering requests are opened as tickets in Linear using the Thread Tools Chrome extension. SDEs use the Linear Creator tab to create requests, selecting the appropriate priority level before submitting."
+  }
+];
+
+let questions = [];
+let current = 0;
+let answers = [];
+let score = 0;
+
+async function loadQuiz() {
+  // Shuffle the fixed questions into a random order
+  questions = [...FIXED_QUESTIONS].sort(() => Math.random() - 0.5);
+  document.getElementById("loading-screen").style.display = "none";
+  document.getElementById("quiz-body").style.display = "block";
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  const body = document.getElementById("quiz-body");
+  const total = questions.length;
+  const pct = (current / total) * 100;
+
+  body.innerHTML = `
+    <div class="progress-label">
+      <span>Question ${current + 1} of ${total}</span>
+      <span>${score} correct so far</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+
+    <div class="card active" id="q-card">
+      <div class="question-num">Question ${current + 1}</div>
+      <div class="question-text">${q.question}</div>
+      <div class="options" id="options">
+        ${q.options.map((opt, i) => `
+          <button class="option" data-index="${i}" onclick="selectOption(${i})">
+            <span class="option-letter">${String.fromCharCode(65+i)}</span>
+            <span>${opt.replace(/^[A-D]\)\s*/, '')}</span>
+          </button>
+        `).join('')}
+      </div>
+      <div class="feedback" id="feedback"></div>
+      <div class="ai-explain" id="ai-explain">
+        <div class="ai-label">Claude's Explanation</div>
+        <div id="ai-text"></div>
+      </div>
+    </div>
+
+    <button class="btn" id="submit-btn" disabled onclick="submitAnswer()">Submit Answer</button>
+    <button class="btn secondary" id="next-btn" style="display:none" onclick="nextQuestion()">
+      ${current + 1 < total ? 'Next Question →' : 'See Results'}
+    </button>
+  `;
+}
+
+let selectedIndex = null;
+
+function selectOption(idx) {
+  const opts = document.querySelectorAll('.option');
+  opts.forEach(o => o.classList.remove('selected'));
+  opts[idx].classList.add('selected');
+  selectedIndex = idx;
+  document.getElementById('submit-btn').disabled = false;
+}
+
+function submitAnswer() {
+  if (selectedIndex === null) return;
+  const q = questions[current];
+  const opts = document.querySelectorAll('.option');
+  const feedback = document.getElementById('feedback');
+  const aiExplain = document.getElementById('ai-explain');
+  const aiText = document.getElementById('ai-text');
+
+  opts.forEach(o => o.classList.add('disabled'));
+  opts[q.correct].classList.add('correct');
+
+  const isCorrect = selectedIndex === q.correct;
+  if (isCorrect) {
+    score++;
+  } else {
+    opts[selectedIndex].classList.add('wrong');
+  }
+
+  feedback.className = `feedback ${isCorrect ? 'correct-fb' : 'wrong-fb'} visible`;
+  feedback.innerHTML = isCorrect
+    ? `<strong>✓ Correct!</strong>`
+    : `<strong>✗ Not quite.</strong> The correct answer was <strong>${String.fromCharCode(65 + q.correct)}</strong>.`;
+
+  aiText.textContent = '';
+  aiExplain.classList.add('visible');
+  streamExplanation(q.explanation, aiText);
+
+  document.getElementById('submit-btn').style.display = 'none';
+  document.getElementById('next-btn').style.display = 'block';
+  answers.push({ q: q.question, selected: selectedIndex, correct: q.correct, isCorrect });
+}
+
+async function streamExplanation(text, el) {
+  el.innerHTML = '<span class="thinking"><span class="dot">●</span><span class="dot">●</span><span class="dot">●</span></span>';
+  await new Promise(r => setTimeout(r, 600));
+  el.textContent = '';
+  for (let i = 0; i < text.length; i++) {
+    el.textContent += text[i];
+    if (i % 3 === 0) await new Promise(r => setTimeout(r, 8));
+  }
+}
+
+function nextQuestion() {
+  current++;
+  selectedIndex = null;
+  if (current >= questions.length) {
+    showResults();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showResults() {
+  document.getElementById('quiz-body').style.display = 'none';
+  const results = document.getElementById('results');
+  results.style.display = 'block';
+
+  const incorrectAnswers = answers.filter(a => !a.isCorrect);
+  const pct = Math.round((score / questions.length) * 100);
+  let verdict, msg;
+  if (pct >= 85) { verdict = "Strong Pass 🎉"; msg = "Excellent work — you've got a solid handle on Week 1 material. You're ready to build on this foundation next week."; }
+  else if (pct >= 60) { verdict = "Pass ✓"; msg = "Good effort! Review the questions you missed and revisit those sections in your onboarding docs before Week 2."; }
+  else { verdict = "Keep Studying 📚"; msg = "Don't worry — Week 1 has a lot of new concepts. Review the onboarding material and ask your SDE guide to walk through anything unclear."; }
+
+  // Build review list
+  const reviewItems = answers.map((a, i) => {
+    const icon = a.isCorrect ? '✅' : '❌';
+    const color = a.isCorrect ? 'var(--green)' : 'var(--muted)';
+    return '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;font-size:13px"><span style="font-size:16px;line-height:1.2;flex-shrink:0">' + icon + '</span><span style="color:' + color + ';">' + questions[i].question + '</span></div>';
+  }).join('');
+
+  // Build what-to-review section
+  const reviewSection = incorrectAnswers.length > 0
+    ? '<hr class="divider"><div style="text-align:left"><div style="font-size:13px;font-weight:600;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.06em">What to Review</div><div id="review-blurb" style="font-size:13px;color:var(--muted);line-height:1.7"><span class="thinking"><span class="dot">●</span><span class="dot">●</span><span class="dot">●</span></span></div></div>'
+    : '';
+
+  results.innerHTML =
+    '<div class="score-ring"><span class="score-num">' + score + '</span><span class="score-denom">/ ' + questions.length + '</span></div>' +
+    '<h2>' + verdict + '</h2>' +
+    '<p>' + msg + '</p>' +
+    '<hr class="divider">' +
+    '<div style="text-align:left"><div style="font-size:13px;font-weight:600;color:var(--muted);margin-bottom:14px;text-transform:uppercase;letter-spacing:0.06em">Review</div>' + reviewItems + '</div>' +
+    reviewSection +
+    '<hr class="divider">' +
+    '<button class="btn secondary" onclick="restartQuiz()">Retake Quiz</button>';
+
+  if (incorrectAnswers.length > 0) {
+    streamReviewBlurb(incorrectAnswers);
+  }
+}
+
+async function streamReviewBlurb(incorrectAnswers) {
+  const el = document.getElementById('review-blurb');
+  if (!el) return;
+
+  const missedTopics = incorrectAnswers.map(a => `- ${a.q}`).join('\n');
+  const prompt = `A new Service Desk Engineer at Thread just completed their Week 1 onboarding quiz and got the following questions wrong:\n\n${missedTopics}\n\nWrite a short, friendly 2-3 sentence blurb telling them specifically what onboarding material they should go back and review. Be specific to the topics missed. Do not use bullet points — just plain prose.`;
+
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 200,
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content.filter(b => b.type === "text").map(b => b.text).join("").trim();
+    el.textContent = '';
+    for (let i = 0; i < text.length; i++) {
+      el.textContent += text[i];
+      if (i % 3 === 0) await new Promise(r => setTimeout(r, 8));
+    }
+  } catch(e) {
+    el.textContent = 'Review the onboarding material related to the questions you missed before moving on to Week 2.';
+  }
+}
+
+function restartQuiz() {
+  current = 0; score = 0; answers = []; selectedIndex = null;
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('loading-screen').style.display = 'flex';
+  document.getElementById('quiz-body').style.display = 'none';
+  loadQuiz();
+}
+
+loadQuiz();
+</script>
+</body>
+</html>
