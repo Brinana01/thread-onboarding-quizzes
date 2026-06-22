@@ -9,6 +9,10 @@
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+  html, body, div, span, p, h1, h2, h3, button {
+    color: #e8ecf5;
+  }
+
   :root {
     --bg: #0d0f14;
     --surface: #161a23;
@@ -60,7 +64,7 @@
     font-size: 28px;
     font-weight: 700;
     line-height: 1.2;
-    color: var(--text);
+    color: #e8ecf5 !important;
     margin-bottom: 8px;
   }
 
@@ -122,7 +126,7 @@
     font-weight: 500;
     line-height: 1.5;
     margin-bottom: 20px;
-    color: var(--text);
+    color: #e8ecf5 !important;
   }
 
   .options {
@@ -144,6 +148,7 @@
     font-size: 14px;
     line-height: 1.4;
     text-align: left;
+    color: #e8ecf5 !important;
   }
   .option:hover:not(.disabled) {
     border-color: var(--accent);
