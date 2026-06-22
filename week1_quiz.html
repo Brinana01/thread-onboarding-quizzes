@@ -477,9 +477,9 @@ function renderQuestion() {
       <div class="question-text">${q.question}</div>
       <div class="options" id="options">
         ${q.options.map((opt, i) => `
-          <button class="option" data-index="${i}" onclick="selectOption(${i})">
-            <span class="option-letter">${String.fromCharCode(65+i)}</span>
-            <span>${opt.replace(/^[A-D]\)\s*/, '')}</span>
+          <button class="option" data-index="${i}" onclick="selectOption(${i})" style="color:#e8ecf5;">
+            <span class="option-letter" style="color:#a0aabf;">${String.fromCharCode(65+i)}</span>
+            <span style="color:#e8ecf5;">${opt.replace(/^[A-D]\)\s*/, '')}</span>
           </button>
         `).join('')}
       </div>
